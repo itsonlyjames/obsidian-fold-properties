@@ -1,11 +1,13 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
-	"isDesktopOnly": false
+  "id": "fold-properties",
+  "name": "Fold Properties",
+  "version": "0.0.1",
+  "minAppVersion": "0.15.0",
+  "description": "Adds Fold/Unfold Properties Function to Folder Context Menu",
+  "author": "James Alexandre",
+  "authorUrl": "https://github.com/itsonlyjames",
+  "fundingUrl": {
+    "GitHub Sponsor": "https://github.com/sponsors/itsonlyjames"
+  },
+  "isDesktopOnly": false
 }
