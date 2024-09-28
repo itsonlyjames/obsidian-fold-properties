@@ -51,7 +51,8 @@ export default class FoldProperties extends Plugin {
     }
 
     async foldPropertiesForFile(file: TFile) {
-        const content = await this.app.vault.read(file)
+        const app = this.app as any
+        const content = await app.vault.read(file)
         const lines = content.split('\n')
 
         const folds = {
@@ -59,14 +60,14 @@ export default class FoldProperties extends Plugin {
             lines: lines.length
         }
 
-        this.app.foldManager.savePath(file.path, folds)
+        app.foldManager.savePath(file.path, folds)
     }
 
     async unfoldPropertiesForFile(file: TFile) {
-        const existingFolds = this.app.foldManager.loadPath(file.path)
+        const existingFolds = (this.app as any).foldManager.loadPath(file.path)
 
         if (existingFolds) {
-            const path = this.app.appId + '-note-fold-' + file.path
+            const path = (this.app as any).appId + '-note-fold-' + file.path
             localStorage.removeItem(path)
         }
     }
