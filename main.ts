@@ -18,7 +18,7 @@ export default class FoldProperties extends Plugin {
                 (menu: Menu, file: TFile | TFolder) => {
                     if (file instanceof TFolder && file.children.length !== 0) {
                         menu.addItem((item) => {
-                            item.setTitle('Fold Properties')
+                            item.setTitle('Fold properties')
                                 .setIcon('fold')
                                 .onClick(async () => {
                                     await this.foldAllProperties(file)
@@ -26,7 +26,7 @@ export default class FoldProperties extends Plugin {
                         })
 
                         menu.addItem((item) => {
-                            item.setTitle('Unfold Properties')
+                            item.setTitle('Unfold properties')
                                 .setIcon('unfold')
                                 .onClick(async () => {
                                     await this.unfoldAllProperties(file)
@@ -34,7 +34,7 @@ export default class FoldProperties extends Plugin {
                         })
                     } else if (file instanceof TFile) {
                         menu.addItem((item) => {
-                            item.setTitle('Fold Properties')
+                            item.setTitle('Fold properties')
                                 .setIcon('fold')
                                 .onClick(async () => {
                                     await this.foldPropertiesForFile(file)
@@ -42,7 +42,7 @@ export default class FoldProperties extends Plugin {
                         })
 
                         menu.addItem((item) => {
-                            item.setTitle('Unfold Properties')
+                            item.setTitle('Unfold properties')
                                 .setIcon('unfold')
                                 .onClick(async () => {
                                     await this.unfoldPropertiesForFile(file)

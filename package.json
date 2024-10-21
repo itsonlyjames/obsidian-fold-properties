@@ -1,7 +1,7 @@
 {
   "name": "obsidian-fold-properties",
   "version": "0.0.2",
-  "description": "Adds Fold/Unfold Properties Function to Folder Context Menu",
+  "description": "Adds fold/unfold properties function to folder context menu",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
