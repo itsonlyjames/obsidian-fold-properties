@@ -22,6 +22,9 @@ export default class FoldProperties extends Plugin {
                                 .setIcon('fold')
                                 .onClick(async () => {
                                     await this.foldAllProperties(file)
+                                    new Notice(
+                                        `Folded properties for all files in ${file.path}`
+                                    )
                                 })
                         })
 
@@ -30,6 +33,9 @@ export default class FoldProperties extends Plugin {
                                 .setIcon('unfold')
                                 .onClick(async () => {
                                     await this.unfoldAllProperties(file)
+                                    new Notice(
+                                        `Unfolded properties for all files in ${file.path}`
+                                    )
                                 })
                         })
                     } else if (file instanceof TFile) {
@@ -38,6 +44,9 @@ export default class FoldProperties extends Plugin {
                                 .setIcon('fold')
                                 .onClick(async () => {
                                     await this.foldPropertiesForFile(file)
+                                    new Notice(
+                                        `Folded properties in ${file.path}`
+                                    )
                                 })
                         })
 
@@ -46,6 +55,9 @@ export default class FoldProperties extends Plugin {
                                 .setIcon('unfold')
                                 .onClick(async () => {
                                     await this.unfoldPropertiesForFile(file)
+                                    new Notice(
+                                        `Unfolded properties in ${file.path}`
+                                    )
                                 })
                         })
                     }
@@ -62,7 +74,6 @@ export default class FoldProperties extends Plugin {
                 await this.foldAllProperties(child)
             }
         }
-        new Notice(`Folded properties for all files in ${folder.path}`)
     }
 
     async unfoldAllProperties(folder: TFolder) {
@@ -73,7 +84,6 @@ export default class FoldProperties extends Plugin {
                 await this.unfoldAllProperties(child)
             }
         }
-        new Notice(`Unfolded properties for all files in ${folder.path}`)
     }
 
     async foldPropertiesForFile(file: TFile) {
