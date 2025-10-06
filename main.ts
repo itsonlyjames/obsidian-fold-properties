@@ -1,4 +1,4 @@
-import { Menu, Notice, Plugin, TFile, TFolder } from 'obsidian'
+import { MarkdownView, Menu, Notice, Plugin, TFile, TFolder } from 'obsidian'
 
 interface Fold {
     from: number
@@ -92,8 +92,11 @@ export default class FoldProperties extends Plugin {
             file.path
         )
 
+        if (existingFolds && this.isPropertiesFolded(existingFolds)) {
+            return
+        }
+
         if (!existingFolds) {
-            // Create new fold object
             const content = await app.vault.read(file)
             const lines = content.split('\n')
             const folds = {
@@ -101,15 +104,32 @@ export default class FoldProperties extends Plugin {
                 lines: lines.length
             }
             app.foldManager.savePath(file.path, folds)
-        }
-
-        if (existingFolds && !this.isPropertiesFolded(existingFolds)) {
-            // Add folded properties to existing fold object
+        } else {
             const foldedProperties = {
                 folds: [{ from: 0, to: 0 }, ...existingFolds.folds],
                 lines: existingFolds.lines
             }
             app.foldManager.savePath(file.path, foldedProperties)
+        }
+
+        // Find and switch to target leaf
+        // Necessary to run fold properties toggle on active open file
+        const leaves = app.workspace.getLeavesOfType('markdown')
+        const targetLeaf = leaves.find(
+            (leaf: { view: MarkdownView }) =>
+                (leaf.view as MarkdownView).file?.path === file.path
+        )
+
+        if (targetLeaf) {
+            const originalLeaf = app.workspace.activeLeaf
+            app.workspace.setActiveLeaf(targetLeaf, { focus: true })
+            await new Promise((resolve) => setTimeout(resolve, 50))
+            await app.commands.executeCommandById(
+                'editor:toggle-fold-properties'
+            )
+            if (originalLeaf && originalLeaf !== targetLeaf) {
+                app.workspace.setActiveLeaf(originalLeaf, { focus: true })
+            }
         }
     }
 
@@ -117,36 +137,44 @@ export default class FoldProperties extends Plugin {
         const app = this.app as any
         const existingFolds = (this.app as any).foldManager.loadPath(file.path)
 
-        // rather than removing entirely the item remove only the folds from 0
-        // can write a function to handle this for both fold/unfold
-        // if the properties are the only ones then we can delete
+        if (!existingFolds || !this.isPropertiesFolded(existingFolds)) {
+            return
+        }
 
-        if (existingFolds && this.isPropertiesFolded(existingFolds)) {
-            /**
-             * Check if all elements in the array have `from` set to 0,
-             * and if at least one element has `to` set to 0.
-             *
-             * This is necessary because Obsidian represents folded properties
-             * using the object structure { from: 0, to: 0 }. However, Obsidian
-             * may also correctly assign other values for the `to` property,
-             * such as { from: 0, to: 7 }.
-             */
-            if (
-                existingFolds.folds.every((el: Fold) => el.from == 0) &&
-                existingFolds.folds.some((el: Fold) => el.to == 0)
-            ) {
-                // Only folded properties exist, remove local storage item
-                const path = app.appId + '-note-fold-' + file.path
-                localStorage.removeItem(path)
-            } else {
-                // contains other folds, strip only the properties
-                const unfoldedProperties = {
-                    folds: existingFolds.folds.filter(
-                        (el: Fold) => el.from !== 0
-                    ),
-                    lines: existingFolds.lines
-                }
-                app.foldManager.savePath(file.path, unfoldedProperties)
+        // Remove properties fold from state
+        if (
+            existingFolds.folds.every((el: Fold) => el.from == 0) &&
+            existingFolds.folds.some((el: Fold) => el.to == 0)
+        ) {
+            // Only properties folded, remove entirely
+            const path = app.appId + '-note-fold-' + file.path
+            localStorage.removeItem(path)
+        } else {
+            // Other folds exist, just remove properties
+            const unfoldedProperties = {
+                folds: existingFolds.folds.filter((el: Fold) => el.from !== 0),
+                lines: existingFolds.lines
+            }
+            app.foldManager.savePath(file.path, unfoldedProperties)
+        }
+
+        // Find and switch to target leaf
+        // Necessary to run fold properties toggle on active open file
+        const leaves = app.workspace.getLeavesOfType('markdown')
+        const targetLeaf = leaves.find(
+            (leaf: { view: MarkdownView }) =>
+                (leaf.view as MarkdownView).file?.path === file.path
+        )
+
+        if (targetLeaf) {
+            const originalLeaf = app.workspace.activeLeaf
+            app.workspace.setActiveLeaf(targetLeaf, { focus: true })
+            await new Promise((resolve) => setTimeout(resolve, 50))
+            await app.commands.executeCommandById(
+                'editor:toggle-fold-properties'
+            )
+            if (originalLeaf && originalLeaf !== targetLeaf) {
+                app.workspace.setActiveLeaf(originalLeaf, { focus: true })
             }
         }
     }
