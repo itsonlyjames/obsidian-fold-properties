@@ -1,4 +1,4 @@
-import { MarkdownView, Menu, Notice, Plugin, TFile, TFolder } from 'obsidian'
+import { App, EventRef, MarkdownView, Menu, Notice, Plugin, TFile, TFolder, Workspace, WorkspaceLeaf } from 'obsidian'
 
 interface Fold {
     from: number
@@ -10,10 +10,29 @@ interface FoldedProperties {
     lines: number
 }
 
+interface FoldManager {
+    loadPath(path: string): FoldedProperties | null
+    savePath(path: string, folds: FoldedProperties): void
+}
+
+interface InternalApp {
+    workspace: Workspace & {
+        on(name: 'file-menu', callback: (menu: Menu, file: TFile | TFolder) => void, ctx?: unknown): EventRef
+        getLeavesOfType(viewType: string): WorkspaceLeaf[]
+        activeLeaf: WorkspaceLeaf | null
+        setActiveLeaf(leaf: WorkspaceLeaf, params?: { focus?: boolean }): void
+    }
+    vault: App['vault']
+    foldManager: FoldManager
+    commands: {
+        executeCommandById(id: string): void
+    }
+}
+
 export default class FoldProperties extends Plugin {
     async onload() {
         this.registerEvent(
-            this.app.workspace.on(
+            (this.app as unknown as InternalApp).workspace.on(
                 'file-menu',
                 (menu: Menu, file: TFile | TFolder) => {
                     if (file instanceof TFolder && file.children.length !== 0) {
@@ -87,7 +106,7 @@ export default class FoldProperties extends Plugin {
     }
 
     async foldPropertiesForFile(file: TFile) {
-        const app = this.app as any
+        const app = this.app as unknown as InternalApp
         const existingFolds: FoldedProperties | null = app.foldManager.loadPath(
             file.path
         )
@@ -116,14 +135,14 @@ export default class FoldProperties extends Plugin {
         // Necessary to run fold properties toggle on active open file
         const leaves = app.workspace.getLeavesOfType('markdown')
         const targetLeaf = leaves.find(
-            (leaf: { view: MarkdownView }) =>
+            (leaf: WorkspaceLeaf) =>
                 (leaf.view as MarkdownView).file?.path === file.path
         )
 
         if (targetLeaf) {
             const originalLeaf = app.workspace.activeLeaf
             app.workspace.setActiveLeaf(targetLeaf, { focus: true })
-            await new Promise((resolve) => setTimeout(resolve, 50))
+            await new Promise((resolve) => activeWindow.setTimeout(resolve, 50))
             await app.commands.executeCommandById(
                 'editor:toggle-fold-properties'
             )
@@ -134,8 +153,8 @@ export default class FoldProperties extends Plugin {
     }
 
     async unfoldPropertiesForFile(file: TFile) {
-        const app = this.app as any
-        const existingFolds = (this.app as any).foldManager.loadPath(file.path)
+        const app = this.app as unknown as InternalApp
+        const existingFolds = app.foldManager.loadPath(file.path)
 
         if (!existingFolds || !this.isPropertiesFolded(existingFolds)) {
             return
@@ -146,9 +165,8 @@ export default class FoldProperties extends Plugin {
             existingFolds.folds.every((el: Fold) => el.from == 0) &&
             existingFolds.folds.some((el: Fold) => el.to == 0)
         ) {
-            // Only properties folded, remove entirely
-            const path = app.appId + '-note-fold-' + file.path
-            localStorage.removeItem(path)
+            // Only properties folded, clear folds entirely via foldManager
+            app.foldManager.savePath(file.path, { folds: [], lines: existingFolds.lines })
         } else {
             // Other folds exist, just remove properties
             const unfoldedProperties = {
@@ -162,14 +180,14 @@ export default class FoldProperties extends Plugin {
         // Necessary to run fold properties toggle on active open file
         const leaves = app.workspace.getLeavesOfType('markdown')
         const targetLeaf = leaves.find(
-            (leaf: { view: MarkdownView }) =>
+            (leaf: WorkspaceLeaf) =>
                 (leaf.view as MarkdownView).file?.path === file.path
         )
 
         if (targetLeaf) {
             const originalLeaf = app.workspace.activeLeaf
             app.workspace.setActiveLeaf(targetLeaf, { focus: true })
-            await new Promise((resolve) => setTimeout(resolve, 50))
+            await new Promise((resolve) => activeWindow.setTimeout(resolve, 50))
             await app.commands.executeCommandById(
                 'editor:toggle-fold-properties'
             )
