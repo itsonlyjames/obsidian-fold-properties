@@ -19,7 +19,7 @@ interface InternalApp {
     workspace: Workspace & {
         on(name: 'file-menu', callback: (menu: Menu, file: TFile | TFolder) => void, ctx?: unknown): EventRef
         getLeavesOfType(viewType: string): WorkspaceLeaf[]
-        activeLeaf: WorkspaceLeaf | null
+        getMostRecentLeaf(): WorkspaceLeaf | null
         setActiveLeaf(leaf: WorkspaceLeaf, params?: { focus?: boolean }): void
     }
     vault: App['vault']
@@ -140,10 +140,10 @@ export default class FoldProperties extends Plugin {
         )
 
         if (targetLeaf) {
-            const originalLeaf = app.workspace.activeLeaf
+            const originalLeaf = app.workspace.getMostRecentLeaf()
             app.workspace.setActiveLeaf(targetLeaf, { focus: true })
-            await new Promise((resolve) => activeWindow.setTimeout(resolve, 50))
-            await app.commands.executeCommandById(
+            await new Promise((resolve) => window.setTimeout(resolve, 50))
+            app.commands.executeCommandById(
                 'editor:toggle-fold-properties'
             )
             if (originalLeaf && originalLeaf !== targetLeaf) {
@@ -185,10 +185,10 @@ export default class FoldProperties extends Plugin {
         )
 
         if (targetLeaf) {
-            const originalLeaf = app.workspace.activeLeaf
+            const originalLeaf = app.workspace.getMostRecentLeaf()
             app.workspace.setActiveLeaf(targetLeaf, { focus: true })
-            await new Promise((resolve) => activeWindow.setTimeout(resolve, 50))
-            await app.commands.executeCommandById(
+            await new Promise((resolve) => window.setTimeout(resolve, 50))
+            app.commands.executeCommandById(
                 'editor:toggle-fold-properties'
             )
             if (originalLeaf && originalLeaf !== targetLeaf) {

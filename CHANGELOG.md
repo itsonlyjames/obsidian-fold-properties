@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.2] - 2026-05-13
+
+### Fixed
+
+- Replaced deprecated `workspace.activeLeaf` with `workspace.getMostRecentLeaf()`
+- Replaced `activeWindow.setTimeout` with `window.setTimeout` per Obsidian guidelines
+- Removed spurious `await` on `executeCommandById` (returns void, not a Promise)
+- Bumped `minAppVersion` to `0.16.3` to match actual `setActiveLeaf` API requirement
+
 ## [0.2.1] - 2026-05-13
 
 ### Fixed
