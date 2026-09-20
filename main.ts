@@ -83,6 +83,36 @@ export default class FoldProperties extends Plugin {
                 }
             )
         )
+
+        this.addCommand({
+            id: 'fold-all-properties',
+            name: 'Fold properties in all notes',
+            callback: async () => {
+                await this.foldAllPropertiesInVault()
+                new Notice('Folded properties in all notes')
+            }
+        })
+
+        this.addCommand({
+            id: 'unfold-all-properties',
+            name: 'Unfold properties in all notes',
+            callback: async () => {
+                await this.unfoldAllPropertiesInVault()
+                new Notice('Unfolded properties in all notes')
+            }
+        })
+    }
+
+    async foldAllPropertiesInVault() {
+        for (const file of this.app.vault.getMarkdownFiles()) {
+            await this.foldPropertiesForFile(file)
+        }
+    }
+
+    async unfoldAllPropertiesInVault() {
+        for (const file of this.app.vault.getMarkdownFiles()) {
+            await this.unfoldPropertiesForFile(file)
+        }
     }
 
     async foldAllProperties(folder: TFolder) {
