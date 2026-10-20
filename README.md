@@ -2,6 +2,10 @@
 
 Adds a "Fold/Unfold Properties" button to the file context menu.
 
+![Fold Properties: right-click a folder, choose Fold properties, and every note folds](docs/hero.gif)
+
+[Watch in full quality (MP4)](docs/hero.mp4)
+
 This feature provides a convenient way to quickly fold or unfold the properties of either a single file or all files within a selected folder.
 
 ## Installation
