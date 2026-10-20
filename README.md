@@ -4,8 +4,6 @@ Fold or unfold the properties of one note, a whole folder, or your entire vault 
 
 ![Fold Properties: right-click a folder, choose Fold properties, and every note folds](docs/hero.gif)
 
-[Watch in full quality (MP4)](docs/hero.mp4)
-
 ## Why
 
 Long property blocks push your actual writing down the page. Obsidian lets you fold properties one note at a time. Fold Properties does it in bulk, and the fold is saved for every note, including the ones you haven't opened yet.
